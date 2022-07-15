@@ -17,7 +17,15 @@ public class JpaMain {
         tx.begin();
 
         try {
+            //영속
+            Member member = em.find(Member.class, 150L); //영속 상태
+            member.setName("AAAAA"); //업데이트 상태
 
+            em.detach(member);//준영속 상태
+            em.clear();//영속성 컨텍스트 전체 초기화
+            em.close();//영속성 컨텍스트 종료
+
+            System.out.println("==================");
             tx.commit();
         }catch (Exception e){
             tx.rollback();
