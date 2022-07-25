@@ -1,5 +1,5 @@
-package hellojpa;
-
-public enum RoleType {
-    GUEST, USER, ADMIN;
-}
+//package hellojpa;
+//
+//public enum RoleType {
+//    GUEST, USER, ADMIN;
+//}
