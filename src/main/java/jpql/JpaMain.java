@@ -18,11 +18,34 @@ public class JpaMain {
         tx.begin();
 
         try {
+            Team teamA = new Team();
+            teamA.setName("팀A");
+            em.persist(teamA);
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+            Team teamB = new Team();
+            teamB.setName("팀B");
+            em.persist(teamB);
+
+            Member member1 = new Member();
+            member1.setUsername("회원1");
+            member1.setAge(10);
+            member1.setType(MemberType.ADMIN);
+            em.persist(member1);
+
+            Member member2 = new Member();
+            member2.setUsername("회원2");
+            member2.setAge(10);
+            member2.setType(MemberType.ADMIN);
+            em.persist(member2);
+
+            Member member3 = new Member();
+            member3.setUsername("회원3");
+            member3.setAge(10);
+            member3.setType(MemberType.ADMIN);
+            em.persist(member3);
+
+            em.flush();
+            em.clear();
 
             TypedQuery<Member> query = em.createQuery("select m from Member m where m.username = :username", Member.class);
             query.setParameter("username","memeber1");
@@ -51,6 +74,56 @@ public class JpaMain {
             //setajoin
             String query3 = "select m from Member m, Team t where m.username = t.name";
             em.createQuery(query3,Member.class);
+
+            //ENUM
+            String query4 = "select m.username, 'HELLO', true from Member m where m.type = jpql.MemberType.USER";
+            em.createQuery(query4,Member.class);
+
+            //case식
+            String query5 = "select" +
+                    " case when m.age <= 10 then '학생요금'" +
+                    " when m.age >= 60 then '경오요금'" +
+                    " else '일반요금' end " +
+                    " from Member m";
+            em.createQuery(query5,String.class);
+
+            //coalece
+            String query6 = "select coalesce(m.username,'이름 없는 회원') from Member m";
+            em.createQuery(query6,String.class);
+
+            //nullif
+            String query7 = "select NULLIF(m.username, '관리자') from Member m";
+            em.createQuery(query7,String.class);
+
+            String query8 = "select m from Member m";
+            List<Member> result = em.createQuery(query8, Member.class).getResultList();
+            for (Member member : result) {
+                System.out.println("member = " + member.getUsername()+", "+member.getTeam().getName());
+            }
+
+            String query9 = "select m from Member m join fetch m.team";
+            em.createQuery(query9, Member.class).getResultList();
+
+            //엔티티 파라미터
+            String query10 = "select m from Member m where m = :member";
+            em.createQuery(query10, Member.class)
+                    .setParameter("member",member1)
+                    .getResultList();
+
+            //named쿼리
+            //flush 자동 호출된다.
+            List<Member> resultList1 = em.createNamedQuery("Member.findByUsername", Member.class)
+                    .setParameter("username", "회원1")
+                    .getResultList();
+
+
+            int i = em.createQuery("update Member m set m.age = 20")
+                    .executeUpdate();
+            //벌크연산 쓰고 em.clear() 호출
+            em.clear();
+            Member member = em.find(Member.class, member1.getId());
+            System.out.println("member = " + member.getAge());
+
 
             tx.commit();
         }catch (Exception e){
