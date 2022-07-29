@@ -119,7 +119,7 @@ public class JpaMain {
 
             int i = em.createQuery("update Member m set m.age = 20")
                     .executeUpdate();
-            //벌크연산 쓰고 em.clear() 호출
+            //벌크연산 쓰고 em.clear() 호출 완료
             em.clear();
             Member member = em.find(Member.class, member1.getId());
             System.out.println("member = " + member.getAge());
